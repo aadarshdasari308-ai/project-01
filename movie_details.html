@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}{{ movie.title }} ({{ movie.release_year }}) | Movie Details & Tollywood Recommendations{% endblock %}
+
+{% block content %}
+<!-- Movie Details Hero -->
+<section class="movie-details-hero">
+  <div class="container">
+    <div class="movie-details-layout">
+      
+      <!-- Primary Poster -->
+      <div class="movie-poster-large">
+        <img 
+          src="{{ movie.poster_url }}" 
+          alt="{{ movie.title }}"
+          class="poster-img"
+          onerror="if(!this.dataset.svg && this.src.includes('.jpg')){ this.dataset.svg='1'; this.src='/static/images/poster_{{ movie.id }}.svg'; } else { this.onerror=null; this.src='/static/images/fallback.svg'; }"
+        >
+      </div>
+
+      <!-- Movie Information -->
+      <div class="movie-info-content">
+        <div class="movie-info-header">
+          <h1 class="detail-title">{{ movie.title }}</h1>
+          
+          <div class="detail-badges">
+            <span class="detail-badge-pill rating">
+              &#9733; {{ movie.rating }} IMDb
+            </span>
+            <span class="detail-badge-pill industry">
+              {{ movie.category }} ({{ movie.language }})
+            </span>
+            <span class="detail-badge-pill">
+              {{ movie.release_year }}
+            </span>
+            {% for g in genre_list %}
+              <a href="{{ url_for('search', genre=g) }}" class="detail-badge-pill" style="color: var(--primary-light);">
+                {{ g }}
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Synopsis Box -->
+        <div class="detail-synopsis-box">
+          <h3>Storyline &amp; Overview</h3>
+          <p>{{ movie.description }}</p>
+        </div>
+
+        <!-- Metadata Grid -->
+        <div class="metadata-grid">
+          <div class="meta-box">
+            <span class="label">Director</span>
+            <span class="value">{{ movie.director }}</span>
+          </div>
+          <div class="meta-box">
+            <span class="label">Starring Cast</span>
+            <span class="value">{{ movie.cast }}</span>
+          </div>
+          <div class="meta-box">
+            <span class="label">Industry / Language</span>
+            <span class="value">{{ movie.category }} &bull; {{ movie.language }}</span>
+          </div>
+          <div class="meta-box">
+            <span class="label">Release Year</span>
+            <span class="value">{{ movie.release_year }}</span>
+          </div>
+        </div>
+
+        <!-- Information Retrieval Match Badge -->
+        <div style="background: rgba(0, 230, 118, 0.08); border-left: 4px solid var(--primary); padding: 14px 18px; border-radius: var(--radius-sm); font-size: 0.9rem; color: #cbd5e1;">
+          <strong style="color: var(--primary);">IRS Vector Space Profiling:</strong>
+          This movie is indexed using TF-IDF feature tokens derived from its narrative plot, genre tags, director credits, and industry categorization. Similar movies below are calculated using pairwise Cosine Similarity vector projection.
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Recommended Tollywood Movies Section -->
+<section class="rec-section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Recommended <span class="accent">Tollywood Movies</span></h2>
+        <p class="section-subtitle">
+          Computed in real time using Cosine Similarity over the TF-IDF feature matrix (excluding {{ movie.title }})
+        </p>
+      </div>
+    </div>
+
+    <!-- Recommendation Status Notice -->
+    {% if rec_status %}
+      <div class="rec-header-notice">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+        <span>{{ rec_status.message }}</span>
+      </div>
+    {% endif %}
+
+    <!-- Recommendation Cards Grid -->
+    {% if recommendations and recommendations|length > 0 %}
+      <div class="movie-grid">
+        {% for rec in recommendations %}
+        <div class="movie-card">
+          <div class="poster-wrapper">
+            <img 
+              src="{{ rec.poster_url }}" 
+              alt="{{ rec.title }}" 
+              class="poster-img"
+              loading="lazy"
+              onerror="if(!this.dataset.svg && this.src.includes('.jpg')){ this.dataset.svg='1'; this.src='/static/images/poster_{{ rec.id }}.svg'; } else { this.onerror=null; this.src='/static/images/fallback.svg'; }"
+            >
+            <div class="badge-container">
+              <span class="badge {% if rec.category == 'Tollywood' %}badge-tollywood{% else %}badge-other{% endif %}">
+                {{ rec.category }}
+              </span>
+              <span class="badge badge-rating">&#9733; {{ rec.rating }}</span>
+            </div>
+            
+            {% if rec.match_percent %}
+            <div class="badge-match">
+              {{ rec.match_percent }}% Sim
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="card-body">
+            <h3 class="movie-title" title="{{ rec.title }}">{{ rec.title }}</h3>
+            <div class="movie-meta">
+              <span>{{ rec.release_year }}</span>
+              <span>&bull;</span>
+              <span>{{ rec.language }}</span>
+            </div>
+
+            <div class="movie-genres">
+              {% for g in rec.genre.split(',')[:2] %}
+                <span class="genre-tag">{{ g.strip() }}</span>
+              {% endfor %}
+            </div>
+
+            <p class="movie-desc-short">{{ rec.description }}</p>
+
+            <div class="card-footer">
+              <a href="{{ url_for('movie_details', movie_id=rec.id) }}" class="btn-details">
+                View Details &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <p>No similar Tollywood movies found matching the cosine similarity threshold.</p>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+{% endblock %}

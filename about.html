@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}Information Retrieval Systems (IRS) Project Documentation | CineIR{% endblock %}
+
+{% block content %}
+<div class="container section">
+
+  <!-- Header -->
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">Information Retrieval <span class="accent">System Architecture</span></h1>
+      <p class="section-subtitle">
+        Comprehensive academic and practical guide to the Vector Space Model, TF-IDF Vectorization, and Cosine Similarity
+      </p>
+    </div>
+  </div>
+
+  <!-- Project Overview -->
+  <div class="doc-section">
+    <h2><span class="num">1</span> Project Objective &amp; Problem Statement</h2>
+    <p>
+      Standard relational databases rely on exact boolean string matching (e.g. <code>WHERE title LIKE '%Baahubali%'</code>). Such systems fail when users search with fuzzy phrases, describe the plot without recalling the exact title, or search across ambiguous multi-genre concepts.
+    </p>
+    <p>
+      This college project implements an <strong>Intelligent Movie Search and Recommendation System</strong> using formal <strong>Information Retrieval Systems (IRS)</strong> concepts. Specifically focusing on <strong>Tollywood (Telugu cinema)</strong>, the system transforms unstructured textual movie documents into high-dimensional vector spaces, computes geometric angles of relevance, and recommends semantically similar Telugu movies.
+    </p>
+
+    <!-- Corpus Stats -->
+    <div class="stats-banner" style="margin-top: 24px;">
+      <div class="stat-item">
+        <div class="stat-number">{{ stats.total_movies }}</div>
+        <div class="stat-title">Indexed Documents</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">{{ stats.tollywood_movies }}</div>
+        <div class="stat-title">Tollywood Movies</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">{{ stats.vocabulary_size }}</div>
+        <div class="stat-title">Vocabulary Size</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">{{ stats.matrix_shape }}</div>
+        <div class="stat-title">TF-IDF Matrix Shape</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- End-to-End Pipeline -->
+  <div class="doc-section">
+    <h2><span class="num">2</span> End-to-End Information Retrieval Pipeline</h2>
+    <div class="pipeline-diagram">
+      <div class="pipeline-step">
+        <strong>1. Document Preprocessing</strong>
+        <span>Load <code>movies.csv</code>, lowercase, remove punctuation, strip stopwords, and construct composite document tokens (Title &times; 3, Genre &times; 3, Category &times; 2, Director, Cast, Description).</span>
+      </div>
+      <div class="pipeline-step">
+        <strong>2. TF-IDF Vectorization</strong>
+        <span>Compute Term Frequencies ($TF$) and Inverse Document Frequencies ($IDF$) with unigram and bigram tokenization ($N\text{-grams} = (1, 2)$) and sublinear scaling.</span>
+      </div>
+      <div class="pipeline-step">
+        <strong>3. Vector Space Projection</strong>
+        <span>Each movie is projected as an $L_2$-normalized vector in a $V$-dimensional Euclidean space (where $V = {{ stats.vocabulary_size }}$ unique word features).</span>
+      </div>
+      <div class="pipeline-step">
+        <strong>4. User Query Vectorization</strong>
+        <span>When a user submits a search query, it is preprocessed and mapped into the identical $V$-dimensional space using the fitted vocabulary.</span>
+      </div>
+      <div class="pipeline-step">
+        <strong>5. Cosine Similarity Ranking</strong>
+        <span>Calculate dot product between the query vector $\vec{Q}$ and every document vector $\vec{D}_i$. Rank results in descending order of similarity score.</span>
+      </div>
+      <div class="pipeline-step">
+        <strong>6. Content-Based Recommendation</strong>
+        <span>For any selected movie, compute pairwise Cosine Similarity against all other movie vectors, exclude the self-match, prioritize Tollywood titles, and return at least 5 similar recommendations.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TF-IDF In Plain English -->
+  <div class="doc-section">
+    <h2><span class="num">3</span> Understanding TF-IDF in Simple English</h2>
+    <p>
+      <strong>TF-IDF</strong> stands for <em>Term Frequency &ndash; Inverse Document Frequency</em>. It measures how important a word is to a particular movie within the entire collection:
+    </p>
+    <ul style="margin-left: 24px; color: var(--text-muted); line-height: 1.8; margin-bottom: 20px;">
+      <li>
+        <strong style="color: #fff;">Term Frequency (TF):</strong> How frequently a word appears in a specific movie document. If the word <em>"Kattappa"</em> appears multiple times in <em>Baahubali</em>, its TF for that movie is high.
+      </li>
+      <li>
+        <strong style="color: #fff;">Inverse Document Frequency (IDF):</strong> How rare or unique a word is across the entire movie dataset. Common words like <em>"the"</em>, <em>"movie"</em>, or <em>"and"</em> appear in almost every record, so their IDF is nearly zero. Rare discriminative words like <em>"reincarnation"</em> or <em>"cricket"</em> appear in only a few movies, receiving a very high IDF weight.
+      </li>
+    </ul>
+
+    <div class="math-card">
+      <div class="math-title">TF-IDF Mathematical Formula</div>
+      <div class="math-formula">
+        $$\text{TF-IDF}(t, d, D) = \text{TF}(t, d) \times \text{IDF}(t, D)$$
+      </div>
+      <div style="margin-top: 10px; color: var(--text-muted); font-size: 0.85rem; font-family: var(--font-sans);">
+        Where $\text{IDF}(t, D) = \ln\left(\frac{1 + |D|}{1 + \text{DF}(t)}\right) + 1$, and sublinear $\text{TF}(t, d) = 1 + \ln(\text{count}(t, d))$.
+      </div>
+    </div>
+  </div>
+
+  <!-- Cosine Similarity In Plain English -->
+  <div class="doc-section">
+    <h2><span class="num">4</span> Understanding Cosine Similarity</h2>
+    <p>
+      In a Vector Space Model, each movie is represented as an arrow (vector) pointing in multi-dimensional space.
+    </p>
+    <p>
+      Instead of measuring the straight-line Euclidean distance between two vectors (which is biased by document length or description word count), <strong>Cosine Similarity measures the cosine of the angle $\theta$ between the two vectors</strong>:
+    </p>
+    <ul style="margin-left: 24px; color: var(--text-muted); line-height: 1.8; margin-bottom: 20px;">
+      <li>If two movies discuss identical themes (e.g., period warfare, fantasy kingdoms), their vectors point in nearly the same direction: $\theta \approx 0^\circ \implies \cos(\theta) \approx 1.0$ (High Similarity).</li>
+      <li>If two movies have completely orthogonal content (e.g., cricket drama vs horror black magic), their vectors are perpendicular: $\theta \approx 90^\circ \implies \cos(\theta) \approx 0.0$ (Zero Similarity).</li>
+    </ul>
+
+    <div class="math-card">
+      <div class="math-title">Cosine Similarity Formula</div>
+      <div class="math-formula">
+        $$\text{Cosine Similarity}(\vec{A}, \vec{B}) = \cos(\theta) = \frac{\vec{A} \cdot \vec{B}}{\|\vec{A}\| \|\vec{B}\|} = \frac{\sum_{i=1}^{V} A_i B_i}{\sqrt{\sum_{i=1}^{V} A_i^2} \sqrt{\sum_{i=1}^{V} B_i^2}}$$
+      </div>
+    </div>
+  </div>
+
+  <!-- Sample Test Queries for Demonstration -->
+  <div class="doc-section">
+    <h2><span class="num">5</span> Sample Demonstration Queries &amp; Expected Outputs</h2>
+    <p>
+      Use these queries during viva presentations and college demonstrations to show the system's intelligent Information Retrieval capabilities:
+    </p>
+
+    <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 20px;">
+      
+      <div class="meta-box" style="padding: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <strong style="color: var(--primary); font-size: 1rem;">Query 1: Exact / Partial Movie Title</strong>
+          <a href="{{ url_for('search', q='Baahubali') }}" class="tag-pill">Test "Baahubali" &rarr;</a>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 6px;">
+          <strong>Input:</strong> <code>Baahubali</code>
+        </p>
+        <p style="color: #cbd5e1; font-size: 0.9rem;">
+          <strong>Expected Result:</strong> Ranks <em>Baahubali: The Beginning</em> and <em>Baahubali 2: The Conclusion</em> at the top with 98% and 97% match. Recommends Telugu period/fantasy movies: <em>Magadheera</em>, <em>Eega</em>, <em>RRR</em>, and <em>Mayabazar</em>.
+        </p>
+      </div>
+
+      <div class="meta-box" style="padding: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <strong style="color: var(--primary); font-size: 1rem;">Query 2: Descriptive / Narrative Storyline</strong>
+          <a href="{{ url_for('search', q='investigative detective murder mystery') }}" class="tag-pill">Test "detective mystery" &rarr;</a>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 6px;">
+          <strong>Input:</strong> <code>investigative detective murder mystery</code>
+        </p>
+        <p style="color: #cbd5e1; font-size: 0.9rem;">
+          <strong>Expected Result:</strong> Ranks <em>HIT: The Second Case</em> (98%), <em>Agent Sai Srinivasa Athreya</em> (94%), and <em>Goodachari</em> (79%) at the top without typing any title.
+        </p>
+      </div>
+
+      <div class="meta-box" style="padding: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <strong style="color: var(--primary); font-size: 1rem;">Query 3: Conceptual Theme &amp; Sports Emotion</strong>
+          <a href="{{ url_for('search', q='cricket father son sport aspiration') }}" class="tag-pill">Test "cricket father son" &rarr;</a>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 6px;">
+          <strong>Input:</strong> <code>cricket father son sport aspiration</code>
+        </p>
+        <p style="color: #cbd5e1; font-size: 0.9rem;">
+          <strong>Expected Result:</strong> Accurately matches <em>Jersey</em> (Nani) at 98% relevance match score due to strong TF-IDF term overlap in sport and emotional description.
+        </p>
+      </div>
+
+      <div class="meta-box" style="padding: 18px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <strong style="color: var(--primary); font-size: 1rem;">Query 4: Occult / Horror Mystery</strong>
+          <a href="{{ url_for('search', q='village curse black magic tantric') }}" class="tag-pill">Test "black magic curse" &rarr;</a>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 6px;">
+          <strong>Input:</strong> <code>village curse black magic tantric</code>
+        </p>
+        <p style="color: #cbd5e1; font-size: 0.9rem;">
+          <strong>Expected Result:</strong> Ranks Telugu horror blockbusters <em>Virupaksha</em> and <em>Arundhati</em> at the top.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

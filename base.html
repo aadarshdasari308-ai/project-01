@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Intelligent Movie Search and Recommendation System | Tollywood IR{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="{{ url_for('index') }}" class="nav-brand">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00e676" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"></rect>
+          <line x1="7" y1="2" x2="7" y2="22"></line>
+          <line x1="17" y1="2" x2="17" y2="22"></line>
+          <line x1="2" y1="12" x2="22" y2="12"></line>
+          <line x1="2" y1="7" x2="7" y2="7"></line>
+          <line x1="2" y1="17" x2="7" y2="17"></line>
+          <line x1="17" y1="17" x2="22" y2="17"></line>
+          <line x1="17" y1="7" x2="22" y2="7"></line>
+        </svg>
+        <span>Cine<span class="highlight">IR</span></span>
+        <span class="brand-badge">Tollywood</span>
+      </a>
+
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="{{ url_for('index') }}" class="nav-link {% if request.path == '/' %}active{% endif %}">Home</a></li>
+          <li><a href="{{ url_for('search') }}" class="nav-link {% if request.path == '/search' %}active{% endif %}">Search Movies</a></li>
+          <li><a href="{{ url_for('genres') }}" class="nav-link {% if request.path == '/genres' %}active{% endif %}">Genres</a></li>
+          <li><a href="{{ url_for('recommendations_hub') }}" class="nav-link {% if request.path == '/recommendations' %}active{% endif %}">Recommendations</a></li>
+          <li><a href="{{ url_for('about') }}" class="nav-link {% if request.path == '/about' %}active{% endif %}">About IRS</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="{{ url_for('search') }}" class="nav-search-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span>Search (Press /)</span>
+        </a>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">&#9776;</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Drawer -->
+  <div class="mobile-nav" id="mobileNav">
+    <ul>
+      <li><a href="{{ url_for('index') }}" class="nav-link">Home</a></li>
+      <li><a href="{{ url_for('search') }}" class="nav-link">Search Movies</a></li>
+      <li><a href="{{ url_for('genres') }}" class="nav-link">Genres</a></li>
+      <li><a href="{{ url_for('recommendations_hub') }}" class="nav-link">Recommendations</a></li>
+      <li><a href="{{ url_for('about') }}" class="nav-link">About IRS Project</a></li>
+    </ul>
+  </div>
+
+  <!-- Main Content Area -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div>
+          <div class="footer-brand">Cine<span>IR</span> &bull; Tollywood Movie Engine</div>
+          <p class="footer-text">Information Retrieval Systems (IRS) College Project</p>
+          <p class="footer-text" style="color: var(--text-dim); margin-top: 4px;">Powered by TF-IDF Vectorization, Vector Space Modeling & Cosine Similarity</p>
+        </div>
+        <ul class="footer-links">
+          <li><a href="{{ url_for('index') }}">Home</a></li>
+          <li><a href="{{ url_for('search') }}">Search</a></li>
+          <li><a href="{{ url_for('genres') }}">Genres</a></li>
+          <li><a href="{{ url_for('recommendations_hub') }}">Recommendations</a></li>
+          <li><a href="{{ url_for('about') }}">IR Documentation</a></li>
+        </ul>
+      </div>
+      <div class="footer-bottom">
+        &copy; 2026 Intelligent Movie Search and Recommendation System &bull; Telugu Cinema Focus &bull; Pure Python & Flask Backend
+      </div>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

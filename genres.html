@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Movie Genres | CineIR Tollywood{% endblock %}
+
+{% block content %}
+<div class="container section">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">Explore by <span class="accent">Film Genre</span></h1>
+      <p class="section-subtitle">Browse Telugu cinema and benchmark movies classified by narrative genre</p>
+    </div>
+  </div>
+
+  <!-- Genre Pills Grid -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 48px;">
+    {% for genre_name, count in genres %}
+    <a href="{{ url_for('search', genre=genre_name) }}" class="meta-box" style="display: flex; align-items: center; justify-content: space-between; border-color: rgba(0, 230, 118, 0.2); transition: var(--transition-fast);">
+      <div>
+        <span class="value" style="font-size: 1.1rem; color: #fff;">{{ genre_name }}</span>
+        <span class="label" style="margin-top: 4px;">{{ count }} Movies</span>
+      </div>
+      <div style="color: var(--primary); font-size: 1.2rem;">&rarr;</div>
+    </a>
+    {% endfor %}
+  </div>
+
+  <!-- Genre Showcases -->
+  {% for genre_name, movies in genre_samples.items() %}
+    {% if movies %}
+    <div style="margin-bottom: 50px;">
+      <div class="section-header" style="margin-bottom: 20px;">
+        <h2 style="font-size: 1.4rem; color: #fff;">
+          Popular <span class="accent">{{ genre_name }}</span> Movies
+        </h2>
+        <a href="{{ url_for('search', genre=genre_name) }}" class="view-all-link">
+          <span>See all {{ genre_name }}</span> &rarr;
+        </a>
+      </div>
+
+      <div class="movie-grid">
+        {% for movie in movies %}
+        <div class="movie-card">
+          <div class="poster-wrapper">
+            <img 
+              src="{{ movie.poster_url }}" 
+              alt="{{ movie.title }}" 
+              class="poster-img"
+              loading="lazy"
+              onerror="if(!this.dataset.svg && this.src.includes('.jpg')){ this.dataset.svg='1'; this.src='/static/images/poster_{{ movie.id }}.svg'; } else { this.onerror=null; this.src='/static/images/fallback.svg'; }"
+            >
+            <div class="badge-container">
+              <span class="badge {% if movie.category == 'Tollywood' %}badge-tollywood{% else %}badge-other{% endif %}">
+                {{ movie.category }}
+              </span>
+              <span class="badge badge-rating">&#9733; {{ movie.rating }}</span>
+            </div>
+          </div>
+          <div class="card-body">
+            <h3 class="movie-title" title="{{ movie.title }}">{{ movie.title }}</h3>
+            <div class="movie-meta">
+              <span>{{ movie.release_year }}</span> &bull; <span>{{ movie.language }}</span>
+            </div>
+            <div class="card-footer">
+              <a href="{{ url_for('movie_details', movie_id=movie.id) }}" class="btn-details">View Details &rarr;</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  {% endfor %}
+
+</div>
+{% endblock %}
